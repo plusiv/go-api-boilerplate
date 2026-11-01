@@ -13,7 +13,19 @@ curl 'http://localhost:8080/items?name=Example&limit=20&offset=0'
 curl http://localhost:8080/items/1
 ```
 
-The repository stores data **in memory**. It is empty after a restart and is not shared between instances. IDs are supplied by the client for this example. This starter has no authentication, authorization, persistent storage, or deployment configuration; add these for your application.
+The repository stores data **in memory**. It is empty after a restart and is not shared between instances. IDs are supplied by the client for this example. This starter has no application authentication, authorization, or persistent storage; add these for your application.
+
+## Run with Docker Compose
+
+Install Docker with the Compose plugin, then run:
+
+```sh
+docker compose up --build
+```
+
+The API is available at `http://localhost:8080`. Set `API_PORT` to change the host port, for example `API_PORT=9000 docker compose up --build`. Compose binds the port to localhost and forces `HTTP_ADDR=:8080` inside the container. Other settings can be provided through an optional `.env` file; see `.env.example`. Compose reads `.env` values into the container, while values exported in your shell are used for Compose interpolation such as `API_PORT`. Stop the application with `docker compose down`.
+
+The image runs as a non-root user. Compose allows 15 seconds for shutdown, giving the API's 10-second drain period time to finish. The example repository remains in memory and loses its data when the container stops.
 
 ## Architecture
 
