@@ -44,6 +44,24 @@ A repository filter combines its present predicates with AND. `In: nil` means no
 
 When adding a database adapter, preserve these semantics, bind values as query parameters, allowlist any sortable column names, propagate context, map storage errors to domain errors, and run the same behavior tests against the real database. Do not assume SQL NULL comparisons behave like Go values.
 
+## Transactions
+
+The optional GORM item repository demonstrates the transaction pattern. It is not wired into the running API, which still uses in-memory storage. Create the schema through migrations and construct the repository and transaction runner with the same `*gorm.DB`. Enable GORM's `TranslateError` option to map supported duplicate-key errors to a conflict.
+
+```go
+repo := gormstore.NewItems(db)
+txRunner := gormstore.NewTransactioner(db)
+err := txRunner.Transaction(ctx, func(tx any) error {
+    items, err := repo.WithTx(tx)
+    if err != nil {
+        return err
+    }
+    return items.Create(ctx, entities.Item{ID: "1", Name: "Example"})
+})
+```
+
+Bind every participating repository with `WithTx` inside the callback. Return an error to roll back, or return nil to commit. Transaction handles and bound repositories are valid only inside the callback. The in-memory adapter does not implement transactions.
+
 ## Configuration
 
 Configuration is loaded from environment variables and an optional `.env` file in the working directory. Existing environment variables take precedence over `.env` values. Invalid settings stop the application before it starts listening. Copy `.env.example` to `.env` for local development; do not commit secrets.

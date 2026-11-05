@@ -10,6 +10,14 @@
 - Add environment settings to the typed configuration in `internal/infrastructure/config`, with defaults and validation where needed. Do not commit secrets.
 - Keep this starter small and application-agnostic. Add infrastructure only when a project needs it.
 
+## Transactions
+
+- Use `repositories.Transactioner` to coordinate work that must commit or roll back together. Repositories that support transactions expose `WithTx` through `repositories.WithTransaction`.
+- Bind each participating repository to the callback's transaction handle and check the `WithTx` error. Use the bound repository for reads and writes in the callback; do not fall back to the original repository.
+- Create the transaction runner and repositories from the same database handle. Do not retain transaction handles or bound repositories after the callback, or use them concurrently beyond its lifetime.
+- Pass the request context to the transaction runner and repository operations. Return errors from the callback to roll back. Preserve cancellation and deadline errors.
+- An adapter must reject incompatible or expired transaction handles. Do not add a no-op `WithTx` to an adapter that cannot provide transaction guarantees.
+
 ## Error handling
 
 - Use `internal/domain/apperrors` for expected application failures: not found, conflict, validation, business rule, rate limit, and gone. Messages on these errors must be safe to return to clients.
