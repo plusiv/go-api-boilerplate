@@ -38,6 +38,8 @@ The image runs as a non-root user. Compose allows 15 seconds for shutdown, givin
 - `internal/infrastructure/logger`: request-scoped structured logger helpers.
 - `internal/infrastructure/config`: typed environment and dotenv configuration.
 
+Persistence models that use GORM can embed `models.AuditDates` from `internal/adapters/outbound/persistence/models`. GORM fills `CreatedAt` and `UpdatedAt` on create and update. Its `DeletedAt` field marks a record as deleted and excludes it from ordinary queries. Use `Unscoped()` to query or permanently delete those records. Other persistence adapters must implement their own deletion behavior. The SQLite integration test for this model requires CGO and a C compiler.
+
 A repository filter combines its present predicates with AND. `In: nil` means no membership constraint; an empty non-nil `In` matches nothing. `NotIn` excludes its values. List filters run before pagination. Results are sorted by ID, then paginated with a zero-based offset and a limit from 1 to 100. Offset pages may shift when concurrent writes occur; use keyset pagination if stable traversal across changes is required. The HTTP example exposes exact `name` matching, `limit`, and `offset`; the remaining filter operators are available at the repository boundary.
 
 When adding a database adapter, preserve these semantics, bind values as query parameters, allowlist any sortable column names, propagate context, map storage errors to domain errors, and run the same behavior tests against the real database. Do not assume SQL NULL comparisons behave like Go values.
