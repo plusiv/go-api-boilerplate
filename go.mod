@@ -7,7 +7,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo-prometheus v0.0.1
-	github.com/labstack/echo/v5 v5.4.0
+	github.com/labstack/echo/v5 v5.4.4
 	github.com/prometheus/client_golang v1.25.0
 	github.com/rotisserie/eris v0.5.4
 	gorm.io/driver/sqlite v1.6.0
